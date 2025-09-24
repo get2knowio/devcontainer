@@ -11,6 +11,10 @@ permissions:
   issues: write
   # actions: read (implicit)
 
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
 jobs:
   renovate:
     name: Run Renovate
@@ -19,6 +23,14 @@ jobs:
       LOG_LEVEL: info
       RENOVATE_CONFIG_FILE: renovate.json
     steps:
+      - name: Verify RENOVATE_TOKEN secret
+        run: |
+          if [ -z "${{ secrets.RENOVATE_TOKEN }}" ]; then
+            echo "ERROR: RENOVATE_TOKEN secret is not set."
+            echo "Create a classic Personal Access Token with at least 'repo' scope (and 'workflow' if you want github-actions manager) and add it as repository secret RENOVATE_TOKEN." \
+                 "Do NOT rely on GITHUB_TOKEN as Renovate requires a PAT for proper PR/workflow triggering.";
+            exit 1
+          fi
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -26,7 +38,7 @@ jobs:
         uses: renovatebot/github-action@v43.0.13
         with:
           configurationFile: renovate.json
-          token: ${{ secrets.RENOVATE_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RENOVATE_TOKEN }}
         env:
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           # Limit concurrency to avoid rate spikes
