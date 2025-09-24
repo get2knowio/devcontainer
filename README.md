@@ -143,3 +143,56 @@ Looking for build internals, CI, migration history, troubleshooting, or how to e
 
 ## 📄 License
 See LICENSE file.
+
+---
+
+## ♻️ Automated Dependency Updates (Renovate)
+This repository uses [Renovate](https://docs.renovatebot.com) to keep DevContainer tooling current.
+
+What it updates:
+- Base image tag in `containers/default/Dockerfile` (Dockerfile manager)
+- Tool version `ARG`s (via custom `regexManagers` in `renovate.json`): `NVM_VERSION`, `POETRY_VERSION`, `EZA_VERSION`, `ACT_VERSION`, `ACTIONLINT_VERSION`, `AST_GREP_VERSION`, `ZELLIJ_VERSION`, `LAZYGIT_VERSION`, `GH_VERSION`
+
+Schedule:
+- Weekly window: before 06:00 UTC every Monday (cron `0 4 * * 1`) keeps noise low.
+
+Workflow:
+1. GitHub Action (`.github/workflows/renovate.yml`) runs on schedule or manual dispatch.
+2. Renovate opens/updates PRs; similar updates are grouped.
+3. A Dependency Dashboard issue tracks pending upgrades.
+
+Adjusting behavior:
+- Change grouping or schedule in `renovate.json`.
+- Trigger an ad‑hoc run: Actions tab → Renovate → Run workflow.
+- Pin / ignore versions: add `packageRules` entries.
+
+Authentication:
+- Defaults to `GITHUB_TOKEN`; optionally add a PAT secret `RENOVATE_TOKEN` (scopes: `repo`, `workflow`) for higher rate limits.
+
+Tips:
+- Merge base image updates promptly; they often include security patches.
+- Review grouped tooling PRs for changelog links (Renovate annotates release notes when available).
+
+### Semantic Commit PR Titles
+Renovate is configured with `:semanticCommits`, so PRs follow Conventional Commit prefixes:
+- `feat(deps)!` – Major updates that may be breaking
+- `feat(deps)` – Minor feature-level updates
+- `fix(deps)` – Patch / bugfix-level updates
+- `chore(deps)` – Non-code-impacting tasks (lockfile maintenance, pinning, etc.)
+
+This improves downstream changelog or release automation compatibility.
+
+### Major vs Minor/Patch Separation
+Package rules split updates:
+- Major upgrades: labeled `major devcontainer tooling upgrades` (require manual review)
+- Minor & patch: grouped as `routine devcontainer tooling (minor+patch)`
+
+Both sets share the same weekly schedule window but remain distinct for risk assessment. You can later enable selective automerge for safe patch updates by adding a rule with `"matchUpdateTypes": ["patch"], "automerge": true.
+
+### Patch Automerge
+Patch-level tooling updates are now auto-merged:
+- Rule: labels include `patch` and `automerge` (see `renovate.json`).
+- Commit style: `fix(deps): update <dep> to vX.Y.Z`.
+- Safety rationale: Patch releases should be backward-compatible; still review occasionally for unexpected regressions.
+- To disable: Remove `automerge` or set `"automerge": false` in that rule.
+- To require status checks: add the required check names to `requiredStatusChecks` array.
