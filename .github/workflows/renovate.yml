@@ -44,7 +44,3 @@ jobs:
           # Limit concurrency to avoid rate spikes
           RENOVATE_PR_HOURLY_LIMIT: 2
           RENOVATE_PR_CONCURRENT_LIMIT: 10
-
-      - name: Dependency Dashboard Comment (optional)
-        if: always()
-        run: echo "Renovate run finished."
