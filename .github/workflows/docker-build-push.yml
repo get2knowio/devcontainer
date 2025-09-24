@@ -4,9 +4,21 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'containers/default/**'
+      - 'scripts/**'
+      - 'renovate.json'
+      - '.github/workflows/docker-build-push.yml'
+      - '.github/workflows/renovate.yml'
   pull_request:
     branches:
       - main
+    paths:
+      - 'containers/default/**'
+      - 'scripts/**'
+      - 'renovate.json'
+      - '.github/workflows/docker-build-push.yml'
+      - '.github/workflows/renovate.yml'
   workflow_dispatch:
 
 env:
