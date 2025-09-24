@@ -5,15 +5,22 @@
     ":semanticCommits"
   ],
   "configMigration": true,
-  "labels": ["dependencies", "devcontainer"],
+  "labels": [
+    "dependencies",
+    "devcontainer"
+  ],
   "prHourlyLimit": 2,
   "prConcurrentLimit": 10,
   "timezone": "UTC",
-  "schedule": ["before 6am on monday"],
+  "schedule": [
+    "before 6am on monday"
+  ],
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG NVM_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG NVM_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -24,7 +31,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG POETRY_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG POETRY_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -35,7 +44,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG EZA_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG EZA_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -46,7 +57,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG ACT_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG ACT_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -57,7 +70,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG ACTIONLINT_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG ACTIONLINT_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -68,7 +83,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG AST_GREP_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG AST_GREP_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -78,7 +95,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG ZELLIJ_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG ZELLIJ_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -89,7 +108,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG LAZYGIT_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG LAZYGIT_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -100,7 +121,9 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^containers\/default\/Dockerfile$/"],
+      "managerFilePatterns": [
+        "/^containers/default/Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG GH_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "ARG GH_VERSION='?(?<currentValue>\\d+\\.\\d+\\.\\d+)'?"
@@ -112,36 +135,77 @@
   ],
   "packageRules": [
     {
-      "matchDatasources": ["github-releases"],
-      "matchUpdateTypes": ["major"],
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "groupName": "major devcontainer tooling upgrades",
-      "labels": ["dependencies", "devcontainer", "tooling", "major"],
-      "schedule": ["before 6am on monday"],
+      "labels": [
+        "dependencies",
+        "devcontainer",
+        "tooling",
+        "major"
+      ],
+      "schedule": [
+        "before 6am on monday"
+      ],
       "automerge": false
     },
     {
-      "matchDatasources": ["github-releases"],
-      "matchUpdateTypes": ["minor"],
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
       "groupName": "minor devcontainer tooling updates",
-      "labels": ["dependencies", "devcontainer", "tooling", "minor"],
-      "schedule": ["before 6am on monday"],
+      "labels": [
+        "dependencies",
+        "devcontainer",
+        "tooling",
+        "minor"
+      ],
+      "schedule": [
+        "before 6am on monday"
+      ],
       "automerge": false
     },
     {
-      "matchDatasources": ["github-releases"],
-      "matchUpdateTypes": ["patch"],
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
       "groupName": "patch devcontainer tooling updates",
-      "labels": ["dependencies", "devcontainer", "tooling", "patch", "automerge"],
-      "schedule": ["before 6am on monday"],
+      "labels": [
+        "dependencies",
+        "devcontainer",
+        "tooling",
+        "patch",
+        "automerge"
+      ],
+      "schedule": [
+        "before 6am on monday"
+      ],
       "automerge": true,
-      "automergeType": "pr",
-      "requiredStatusChecks": []
+      "automergeType": "pr"
     },
     {
-      "matchManagers": ["dockerfile"],
+      "matchManagers": [
+        "dockerfile"
+      ],
       "groupName": "base image",
-      "labels": ["dependencies", "devcontainer", "base-image"],
-      "schedule": ["before 6am on monday"],
+      "labels": [
+        "dependencies",
+        "devcontainer",
+        "base-image"
+      ],
+      "schedule": [
+        "before 6am on monday"
+      ],
       "automerge": false
     }
   ]
