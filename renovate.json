@@ -12,6 +12,7 @@
   "prHourlyLimit": 2,
   "prConcurrentLimit": 10,
   "timezone": "UTC",
+  "pinDigests": true,
   "schedule": [
     "before 6am on monday"
   ],
@@ -134,6 +135,30 @@
     }
   ],
   "packageRules": [
+    {
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "matchPackageNames": [
+        "mcr.microsoft.com/devcontainers/python"
+      ],
+      "groupName": "base image",
+      "labels": [
+        "dependencies",
+        "devcontainer",
+        "base-image"
+      ],
+      "pinDigests": true,
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false,
+      "schedule": [
+        "before 6am on monday"
+      ],
+      "automerge": false
+    },
     {
       "matchDatasources": [
         "github-releases"

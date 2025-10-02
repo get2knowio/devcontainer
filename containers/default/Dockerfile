@@ -24,7 +24,7 @@
 ########################################################################
 
 # syntax=docker/dockerfile:1.7-labs
-FROM mcr.microsoft.com/devcontainers/python:3.13
+FROM mcr.microsoft.com/devcontainers/python:3.12
 
 LABEL maintainer="you@example.com"
 
