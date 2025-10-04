@@ -110,6 +110,23 @@ Notes:
 }
 ```
 
+## ⚙️ Build Customization
+
+The image supports several build arguments for customization:
+
+- `INSTALL_AI_CLIS` (default: `true`) - Install AI CLI tools (Gemini, Claude, OpenAI Codex)
+- `INSTALL_HEAVY_TOOLS` (default: `true`) - Install heavy development tools (act, actionlint, ast-grep, zellij, lazygit, gh)
+
+Example of building a minimal version without heavy tools:
+```bash
+docker build \
+  --build-arg INSTALL_HEAVY_TOOLS=false \
+  -t devcontainer:minimal \
+  containers/default
+```
+
+This can save significant build time and image size for users who don't need these specific tools.
+
 ---
 
 ## 🚀 Quick Interactive Dev Container Shell

@@ -44,10 +44,14 @@ Overridable Docker build args (see Dockerfile):
 - `EZA_VERSION`
 - `NVM_VERSION`
 - `POETRY_VERSION`
+- `INSTALL_AI_CLIS` (default: `true`) - Controls AI CLI installation
+- `INSTALL_HEAVY_TOOLS` (default: `true`) - Controls heavy tools (act, actionlint, ast-grep, zellij, lazygit, gh)
 
 Example:
 ```
 docker build --build-arg ACT_VERSION=v0.2.69 -t devcontainer:test containers/default
+# Build without heavy tools to save space/time
+docker build --build-arg INSTALL_HEAVY_TOOLS=false -t devcontainer:minimal containers/default
 ```
 
 ## Test Workflow
