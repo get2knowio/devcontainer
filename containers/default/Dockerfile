@@ -82,78 +82,88 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # ------------------------------------------------------------------
 # Optional heavy tools (act, actionlint, ast-grep, zellij, lazygit, gh)
 # Can be disabled with --build-arg INSTALL_HEAVY_TOOLS=false
+# Individual tools can be disabled with specific build args
 # ------------------------------------------------------------------
 ARG INSTALL_HEAVY_TOOLS
-RUN if [ "${INSTALL_HEAVY_TOOLS}" = "true" ]; then \
+ARG INSTALL_ACT=true
+ARG INSTALL_ACTIONLINT=true
+ARG INSTALL_AST_GREP=true
+ARG INSTALL_ZELLIJ=true
+ARG INSTALL_LAZYGIT=true
+ARG INSTALL_GH=true
+RUN --mount=type=tmpfs,target=/tmp \
+    if [ "${INSTALL_HEAVY_TOOLS}" = "true" ]; then \
         ARCH=$(dpkg --print-architecture) && \
-        echo "Installing act (GitHub Actions emulator) ${ACT_VERSION}" && \
-        case "$ARCH" in \
-            amd64) ACT_ARCH="x86_64" ;; \
-            arm64) ACT_ARCH="arm64" ;; \
-            *) echo "Unsupported architecture for act: $ARCH" && exit 1 ;; \
-        esac && \
-        ACT_URL="https://github.com/nektos/act/releases/download/v${ACT_VERSION}/act_Linux_${ACT_ARCH}.tar.gz" && \
-        curl -fsSL "$ACT_URL" | tar -xz -C /usr/local/bin act && \
-        chmod +x /usr/local/bin/act && \
-        rm -rf /tmp/* /var/tmp/* && \
-        echo "Installing actionlint ${ACTIONLINT_VERSION}" && \
-        case "$ARCH" in \
-            amd64) ACTIONLINT_ARCH="amd64" ;; \
-            arm64) ACTIONLINT_ARCH="arm64" ;; \
-            *) echo "Unsupported architecture for actionlint: $ARCH" && exit 1 ;; \
-        esac && \
-        ACTIONLINT_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_${ACTIONLINT_ARCH}.tar.gz" && \
-        curl -fsSL "$ACTIONLINT_URL" | tar -xz -C /usr/local/bin actionlint && \
-        chmod +x /usr/local/bin/actionlint && \
-        rm -rf /tmp/* /var/tmp/* && \
-        echo "Installing ast-grep ${AST_GREP_VERSION}" && \
-        case "$ARCH" in \
-            amd64) SG_ARCH="x86_64" ;; \
-            arm64) SG_ARCH="aarch64" ;; \
-            *) echo "Unsupported architecture for ast-grep: $ARCH" && exit 1 ;; \
-        esac && \
-        AST_GREP_URL="https://github.com/ast-grep/ast-grep/releases/download/${AST_GREP_VERSION}/app-${SG_ARCH}-unknown-linux-gnu.zip" && \
-        curl -fsSL "$AST_GREP_URL" -o /tmp/ast-grep.zip && \
-        unzip -q /tmp/ast-grep.zip -d /tmp/ast-grep && \
-        install /tmp/ast-grep/sg /usr/local/bin/sg && \
-        install /tmp/ast-grep/ast-grep /usr/local/bin/ast-grep || cp /tmp/ast-grep/sg /usr/local/bin/ast-grep && \
-        rm -rf /tmp/ast-grep /tmp/ast-grep.zip && \
-        rm -rf /tmp/* /var/tmp/* && \
-        echo "Installing zellij ${ZELLIJ_VERSION}" && \
-        case "$ARCH" in \
-            amd64) ZELLIJ_ARCH="x86_64" ;; \
-            arm64) ZELLIJ_ARCH="aarch64" ;; \
-            *) echo "Unsupported architecture for zellij: $ARCH" && exit 1 ;; \
-        esac && \
-        ZELLIJ_URL="https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/zellij-${ZELLIJ_ARCH}-unknown-linux-musl.tar.gz" && \
-        curl -fsSL "$ZELLIJ_URL" -o /tmp/zellij.tgz && \
-        tar -xzf /tmp/zellij.tgz -C /usr/local/bin zellij && \
-        rm -f /tmp/zellij.tgz && \
-        rm -rf /tmp/* /var/tmp/* && \
-        echo "Installing lazygit ${LAZYGIT_VERSION}" && \
-        case "$ARCH" in \
-            amd64) LG_ARCH="x86_64" ;; \
-            arm64) LG_ARCH="arm64" ;; \
-            *) echo "Unsupported architecture for lazygit: $ARCH" && exit 1 ;; \
-        esac && \
-        LG_URL="https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${LG_ARCH}.tar.gz" && \
-        curl -fsSL "$LG_URL" -o /tmp/lazygit.tgz && \
-        tar -xzf /tmp/lazygit.tgz -C /tmp lazygit && \
-        install /tmp/lazygit /usr/local/bin/lazygit && \
-        rm -f /tmp/lazygit.tgz /tmp/lazygit && \
-        rm -rf /tmp/* /var/tmp/* && \
-        echo "Installing GitHub CLI gh ${GH_VERSION}" && \
-        case "$ARCH" in \
-            amd64) GH_ARCH="amd64" ;; \
-            arm64) GH_ARCH="arm64" ;; \
-            *) echo "Unsupported architecture for gh: $ARCH" && exit 1 ;; \
-        esac && \
-        GH_URL="https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${GH_ARCH}.tar.gz" && \
-        mkdir -p /tmp/gh && curl -fsSL "$GH_URL" -o /tmp/gh.tgz && \
-        tar -xzf /tmp/gh.tgz -C /tmp/gh && \
-        install /tmp/gh/gh_${GH_VERSION}_linux_${GH_ARCH}/bin/gh /usr/local/bin/gh && \
-        rm -rf /tmp/gh /tmp/gh.tgz && \
-        rm -rf /tmp/* /var/tmp/*; \
+        if [ "${INSTALL_ACT}" = "true" ]; then \
+            echo "Installing act (GitHub Actions emulator) ${ACT_VERSION}" && \
+            case "$ARCH" in \
+                amd64) ACT_ARCH="x86_64" ;; \
+                arm64) ACT_ARCH="arm64" ;; \
+                *) echo "Unsupported architecture for act: $ARCH" && exit 1 ;; \
+            esac && \
+            ACT_URL="https://github.com/nektos/act/releases/download/v${ACT_VERSION}/act_Linux_${ACT_ARCH}.tar.gz" && \
+            curl -fsSL "$ACT_URL" | tar -xz -C /usr/local/bin act && \
+            chmod +x /usr/local/bin/act; \
+        fi && \
+        if [ "${INSTALL_ACTIONLINT}" = "true" ]; then \
+            echo "Installing actionlint ${ACTIONLINT_VERSION}" && \
+            case "$ARCH" in \
+                amd64) ACTIONLINT_ARCH="amd64" ;; \
+                arm64) ACTIONLINT_ARCH="arm64" ;; \
+                *) echo "Unsupported architecture for actionlint: $ARCH" && exit 1 ;; \
+            esac && \
+            ACTIONLINT_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_${ACTIONLINT_ARCH}.tar.gz" && \
+            curl -fsSL "$ACTIONLINT_URL" | tar -xz -C /usr/local/bin actionlint && \
+            chmod +x /usr/local/bin/actionlint; \
+        fi && \
+        if [ "${INSTALL_AST_GREP}" = "true" ]; then \
+            echo "Installing ast-grep ${AST_GREP_VERSION}" && \
+            case "$ARCH" in \
+                amd64) SG_ARCH="x86_64" ;; \
+                arm64) SG_ARCH="aarch64" ;; \
+                *) echo "Unsupported architecture for ast-grep: $ARCH" && exit 1 ;; \
+            esac && \
+            AST_GREP_URL="https://github.com/ast-grep/ast-grep/releases/download/${AST_GREP_VERSION}/app-${SG_ARCH}-unknown-linux-gnu.zip" && \
+            curl -fsSL "$AST_GREP_URL" -o /tmp/ast-grep.zip && \
+            unzip -q /tmp/ast-grep.zip -d /tmp/ast-grep && \
+            install /tmp/ast-grep/sg /usr/local/bin/sg && \
+            install /tmp/ast-grep/ast-grep /usr/local/bin/ast-grep || cp /tmp/ast-grep/sg /usr/local/bin/ast-grep; \
+        fi && \
+        if [ "${INSTALL_ZELLIJ}" = "true" ]; then \
+            echo "Installing zellij ${ZELLIJ_VERSION}" && \
+            case "$ARCH" in \
+                amd64) ZELLIJ_ARCH="x86_64" ;; \
+                arm64) ZELLIJ_ARCH="aarch64" ;; \
+                *) echo "Unsupported architecture for zellij: $ARCH" && exit 1 ;; \
+            esac && \
+            ZELLIJ_URL="https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/zellij-${ZELLIJ_ARCH}-unknown-linux-musl.tar.gz" && \
+            curl -fsSL "$ZELLIJ_URL" -o /tmp/zellij.tgz && \
+            tar -xzf /tmp/zellij.tgz -C /usr/local/bin zellij; \
+        fi && \
+        if [ "${INSTALL_LAZYGIT}" = "true" ]; then \
+            echo "Installing lazygit ${LAZYGIT_VERSION}" && \
+            case "$ARCH" in \
+                amd64) LG_ARCH="x86_64" ;; \
+                arm64) LG_ARCH="arm64" ;; \
+                *) echo "Unsupported architecture for lazygit: $ARCH" && exit 1 ;; \
+            esac && \
+            LG_URL="https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${LG_ARCH}.tar.gz" && \
+            curl -fsSL "$LG_URL" -o /tmp/lazygit.tgz && \
+            tar -xzf /tmp/lazygit.tgz -C /tmp lazygit && \
+            install /tmp/lazygit /usr/local/bin/lazygit; \
+        fi && \
+        if [ "${INSTALL_GH}" = "true" ]; then \
+            echo "Installing GitHub CLI gh ${GH_VERSION}" && \
+            case "$ARCH" in \
+                amd64) GH_ARCH="amd64" ;; \
+                arm64) GH_ARCH="arm64" ;; \
+                *) echo "Unsupported architecture for gh: $ARCH" && exit 1 ;; \
+            esac && \
+            GH_URL="https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${GH_ARCH}.tar.gz" && \
+            mkdir -p /tmp/gh && curl -fsSL "$GH_URL" -o /tmp/gh.tgz && \
+            tar -xzf /tmp/gh.tgz -C /tmp/gh && \
+            install /tmp/gh/gh_${GH_VERSION}_linux_${GH_ARCH}/bin/gh /usr/local/bin/gh; \
+        fi; \
     else \
         echo "Skipping heavy tools installation (INSTALL_HEAVY_TOOLS=false)"; \
     fi && \
@@ -161,7 +171,8 @@ RUN if [ "${INSTALL_HEAVY_TOOLS}" = "true" ]; then \
     if ! command -v zoxide >/dev/null 2>&1; then \
         echo "Installing latest zoxide via upstream script"; \
         curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash -s -- -b /usr/local/bin; \
-    fi
+    fi && \
+    rm -rf /var/tmp/*
 
 # ------------------------------------------------------------------
 # Starship prompt and shell enhancements
@@ -169,17 +180,16 @@ RUN if [ "${INSTALL_HEAVY_TOOLS}" = "true" ]; then \
 RUN curl -sS https://starship.rs/install.sh | sh -s -- -y && \
     mkdir -p ${USER_HOME}/.config && \
     printf 'command_timeout = 2000\n[container]\ndisabled = true\n[docker_context]\ndisabled = true\n' > ${USER_HOME}/.config/starship.toml && \
-    echo 'eval "$(starship init zsh)"'                               >> ${USER_HOME}/.zshrc && \
-    echo '# zoxide (smart cd) init'                                    >> ${USER_HOME}/.zshrc && \
-    echo 'eval "$(zoxide init zsh)"'                                 >> ${USER_HOME}/.zshrc && \
-    echo 'alias ls="eza --icons"'                                    >> ${USER_HOME}/.zshrc && \
-    echo 'alias ll="eza -l --icons"'                                 >> ${USER_HOME}/.zshrc && \
-    echo 'alias la="eza -la --icons"'                                >> ${USER_HOME}/.zshrc
-
-# Basic nvm bootstrap (interactive shells will also run later 'nvm use')
-RUN echo 'export NVM_DIR="$HOME/.nvm"' >> ${USER_HOME}/.zshrc && \
+    echo 'eval "$(starship init zsh)"' >> ${USER_HOME}/.zshrc && \
+    echo '# zoxide (smart cd) init' >> ${USER_HOME}/.zshrc && \
+    echo 'eval "$(zoxide init zsh)"' >> ${USER_HOME}/.zshrc && \
+    echo 'alias ls="eza --icons"' >> ${USER_HOME}/.zshrc && \
+    echo 'alias ll="eza -l --icons"' >> ${USER_HOME}/.zshrc && \
+    echo 'alias la="eza -la --icons"' >> ${USER_HOME}/.zshrc && \
+    echo 'export NVM_DIR="$HOME/.nvm"' >> ${USER_HOME}/.zshrc && \
     echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> ${USER_HOME}/.zshrc && \
-    chown -R ${USERNAME}:${USERNAME} ${USER_HOME}
+    chown -R ${USERNAME}:${USERNAME} ${USER_HOME} && \
+    rm -rf /tmp/* /var/tmp/*
 
 # ------------------------------------------------------------------
 # Switch to non-root for language tool installs
@@ -189,6 +199,7 @@ USER ${USERNAME}
 # Node.js LTS via nvm, then global tooling and AI CLIs
 RUN --mount=type=cache,target=/home/vscode/.cache,uid=1000,gid=1000 \
     --mount=type=cache,target=/home/vscode/.npm,uid=1000,gid=1000 \
+    --mount=type=tmpfs,target=/tmp \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash && \
     export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && \
     nvm install --lts && nvm alias default 'lts/*' && \
@@ -197,26 +208,15 @@ RUN --mount=type=cache,target=/home/vscode/.cache,uid=1000,gid=1000 \
     npm install -g pnpm yarn && \
     npm install -g typescript ts-node tsx @types/node nodemon concurrently && \
     npm install -g vite esbuild prettier eslint @biomejs/biome tsc-watch && \
+    echo 'nvm use --silent default >/dev/null 2>&1 || nvm use --silent --lts >/dev/null 2>&1' >> ${USER_HOME}/.zshrc && \
     npm cache clean --force && \
-    rm -rf /tmp/* /var/tmp/*
+    rm -rf ${HOME}/.cache/* && \
+    rm -rf /var/tmp/*
 
-# Add silent nvm use to interactive shells
-RUN echo 'nvm use --silent default >/dev/null 2>&1 || nvm use --silent --lts >/dev/null 2>&1' >> ${USER_HOME}/.zshrc
-
-# Install Bun (JavaScript runtime and package manager)
+# Install Bun (JavaScript runtime and package manager) and add shell aliases
 RUN curl -fsSL https://bun.sh/install | bash && \
     echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ${USER_HOME}/.zshrc && \
-    rm -rf /tmp/* /var/tmp/*
-
-# Make Bun available system-wide by adding to PATH
-USER root
-RUN echo 'export PATH="/home/vscode/.bun/bin:$PATH"' >> /etc/profile && \
-    ln -sf /home/vscode/.bun/bin/bun /usr/local/bin/bun && \
-    ln -sf /home/vscode/.bun/bin/bunx /usr/local/bin/bunx
-USER ${USERNAME}
-
-# Helpful TS aliases for zsh
-RUN echo '# TypeScript development aliases' >> ${USER_HOME}/.zshrc && \
+    echo '# TypeScript development aliases' >> ${USER_HOME}/.zshrc && \
     echo 'alias tsc="npx tsc"' >> ${USER_HOME}/.zshrc && \
     echo 'alias tsx="npx tsx"' >> ${USER_HOME}/.zshrc && \
     echo 'alias tsw="npx tsc-watch"' >> ${USER_HOME}/.zshrc && \
@@ -226,10 +226,8 @@ RUN echo '# TypeScript development aliases' >> ${USER_HOME}/.zshrc && \
     echo 'alias lint="npm run lint"' >> ${USER_HOME}/.zshrc && \
     echo 'alias format="npm run format"' >> ${USER_HOME}/.zshrc && \
     echo '# Add npm completion if available' >> ${USER_HOME}/.zshrc && \
-    echo 'if command -v npm >/dev/null 2>&1; then eval "$(npm completion zsh)"; fi' >> ${USER_HOME}/.zshrc
-
-# Helpful Rust aliases and shell configuration for zsh
-RUN echo '# Rust development aliases' >> ${USER_HOME}/.zshrc && \
+    echo 'if command -v npm >/dev/null 2>&1; then eval "$(npm completion zsh)"; fi' >> ${USER_HOME}/.zshrc && \
+    echo '# Rust development aliases' >> ${USER_HOME}/.zshrc && \
     echo 'alias cr="cargo run"' >> ${USER_HOME}/.zshrc && \
     echo 'alias cb="cargo build"' >> ${USER_HOME}/.zshrc && \
     echo 'alias ct="cargo test"' >> ${USER_HOME}/.zshrc && \
@@ -246,7 +244,15 @@ RUN echo '# Rust development aliases' >> ${USER_HOME}/.zshrc && \
     echo '  rustup completions zsh > ~/.zsh/completion/_rustup 2>/dev/null || true' >> ${USER_HOME}/.zshrc && \
     echo '  rustup completions zsh cargo > ~/.zsh/completion/_cargo 2>/dev/null || true' >> ${USER_HOME}/.zshrc && \
     echo '  fpath=(~/.zsh/completion $fpath)' >> ${USER_HOME}/.zshrc && \
-    echo 'fi' >> ${USER_HOME}/.zshrc
+    echo 'fi' >> ${USER_HOME}/.zshrc && \
+    rm -rf /tmp/* /var/tmp/*
+
+# Make Bun available system-wide by adding to PATH
+USER root
+RUN echo 'export PATH="/home/vscode/.bun/bin:$PATH"' >> /etc/profile && \
+    ln -sf /home/vscode/.bun/bin/bun /usr/local/bin/bun && \
+    ln -sf /home/vscode/.bun/bin/bunx /usr/local/bin/bunx
+USER ${USERNAME}
 
 # ------------------------------------------------------------------
 # Poetry installation (Dockerfile, not a feature)
@@ -254,13 +260,13 @@ RUN echo '# Rust development aliases' >> ${USER_HOME}/.zshrc && \
 USER root
 ENV POETRY_HOME=/opt/poetry
 RUN --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=tmpfs,target=/tmp \
     curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION} && \
     ln -s ${POETRY_HOME}/bin/poetry /usr/local/bin/poetry && \
-    rm -rf /tmp/* /var/tmp/*
+    rm -rf /var/tmp/*
 
 # Configure Poetry for vscode user (in-project virtualenvs)
 USER ${USERNAME}
-# Set global Poetry config (cannot use --local without a pyproject)
 RUN poetry config virtualenvs.in-project true --global || true
 
 # ------------------------------------------------------------------
@@ -270,9 +276,10 @@ RUN poetry config virtualenvs.in-project true --global || true
 # Note: Rust itself is installed via devcontainer feature
 RUN --mount=type=cache,target=${USER_HOME}/.cargo/registry \
     --mount=type=cache,target=${USER_HOME}/.cargo/git \
+    --mount=type=tmpfs,target=/tmp \
     cargo install cargo-watch cargo-edit cargo-audit 2>/dev/null || \
     echo "Note: Some cargo tools may fail to install during build but will be available at runtime" && \
-    rm -rf /tmp/* /var/tmp/*
+    rm -rf /var/tmp/*
 
 # Set zsh as the default shell for the vscode user
 USER root

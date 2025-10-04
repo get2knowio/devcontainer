@@ -6,7 +6,16 @@
     "dockerfile": "../Dockerfile",
     "context": "..",
     "args": {
-      "BUILDKIT_INLINE_CACHE": "1"
+      "BUILDKIT_INLINE_CACHE": "1",
+      "INSTALL_HEAVY_TOOLS": "true",
+      "INSTALL_ACT": "true",
+      "INSTALL_ACTIONLINT": "true",
+      "INSTALL_AST_GREP": "true",
+      "INSTALL_ZELLIJ": "true",
+      "INSTALL_LAZYGIT": "true",
+      "INSTALL_GH": "true",
+      "INSTALL_AI_CLIS": "true",
+      "UPDATE_NPM": "true"
     }
   },
   "features": {
