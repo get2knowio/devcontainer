@@ -37,6 +37,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Free up runner disk space
+        run: |
+          echo "Available space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android  
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/graalvm
+          sudo rm -rf /usr/local/share/boost
+          docker system prune -af
+          echo "Available space after cleanup:"
+          df -h
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:

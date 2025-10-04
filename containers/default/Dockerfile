@@ -35,6 +35,7 @@ ARG NVM_VERSION=0.40.3
 ARG NVM_DIR=/home/vscode/.nvm
 ARG POETRY_VERSION=2.2.1
 ARG INSTALL_AI_CLIS=true
+ARG INSTALL_HEAVY_TOOLS=true
 ARG UPDATE_NPM=true
 ARG EZA_VERSION=0.23.3
 ARG ACT_VERSION=0.2.81
@@ -65,6 +66,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get install -y --no-install-recommends \
         build-essential bat ripgrep fd-find jq fzf curl ca-certificates \
         python3-venv gnupg2 lsb-release neovim unzip tmux zoxide && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
     ln -sf /usr/bin/batcat /usr/bin/bat && \
     ln -sf /usr/bin/fdfind /usr/bin/fd && \
     ARCH=$(dpkg --print-architecture) && \
@@ -75,72 +77,86 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     esac && \
     EZA_TAR_URL="https://github.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_${EZA_ARCH}-unknown-linux-gnu.tar.gz" && \
     curl -fsSL "$EZA_TAR_URL" | tar -xzf - -C /usr/local/bin/ && \
-    echo "Installing act (GitHub Actions emulator) ${ACT_VERSION}" && \
-    case "$ARCH" in \
-        amd64) ACT_ARCH="x86_64" ;; \
-        arm64) ACT_ARCH="arm64" ;; \
-        *) echo "Unsupported architecture for act: $ARCH" && exit 1 ;; \
-    esac && \
-    ACT_URL="https://github.com/nektos/act/releases/download/v${ACT_VERSION}/act_Linux_${ACT_ARCH}.tar.gz" && \
-    curl -fsSL "$ACT_URL" | tar -xz -C /usr/local/bin act && \
-    chmod +x /usr/local/bin/act && \
-    echo "Installing actionlint ${ACTIONLINT_VERSION}" && \
-    case "$ARCH" in \
-        amd64) ACTIONLINT_ARCH="amd64" ;; \
-        arm64) ACTIONLINT_ARCH="arm64" ;; \
-        *) echo "Unsupported architecture for actionlint: $ARCH" && exit 1 ;; \
-    esac && \
-    ACTIONLINT_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_${ACTIONLINT_ARCH}.tar.gz" && \
-    curl -fsSL "$ACTIONLINT_URL" | tar -xz -C /usr/local/bin actionlint && \
-    chmod +x /usr/local/bin/actionlint && \
-    echo "Installing ast-grep ${AST_GREP_VERSION}" && \
-    case "$ARCH" in \
-        amd64) SG_ARCH="x86_64" ;; \
-        arm64) SG_ARCH="aarch64" ;; \
-        *) echo "Unsupported architecture for ast-grep: $ARCH" && exit 1 ;; \
-    esac && \
-    AST_GREP_URL="https://github.com/ast-grep/ast-grep/releases/download/${AST_GREP_VERSION}/app-${SG_ARCH}-unknown-linux-gnu.zip" && \
-    curl -fsSL "$AST_GREP_URL" -o /tmp/ast-grep.zip && \
-    unzip -q /tmp/ast-grep.zip -d /tmp/ast-grep && \
-    install /tmp/ast-grep/sg /usr/local/bin/sg && \
-    install /tmp/ast-grep/ast-grep /usr/local/bin/ast-grep || cp /tmp/ast-grep/sg /usr/local/bin/ast-grep && \
-    rm -rf /tmp/ast-grep /tmp/ast-grep.zip && \
-    rm -rf /var/lib/apt/lists/* && \
-    echo "Installing zellij ${ZELLIJ_VERSION}" && \
-    ARCH=$(dpkg --print-architecture) && \
-    case "$ARCH" in \
-        amd64) ZELLIJ_ARCH="x86_64" ;; \
-        arm64) ZELLIJ_ARCH="aarch64" ;; \
-        *) echo "Unsupported architecture for zellij: $ARCH" && exit 1 ;; \
-    esac && \
-    ZELLIJ_URL="https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/zellij-${ZELLIJ_ARCH}-unknown-linux-musl.tar.gz" && \
-    curl -fsSL "$ZELLIJ_URL" -o /tmp/zellij.tgz && \
-    tar -xzf /tmp/zellij.tgz -C /usr/local/bin zellij && \
-    rm -f /tmp/zellij.tgz && \
-    echo "Installing lazygit ${LAZYGIT_VERSION}" && \
-    ARCH=$(dpkg --print-architecture) && \
-    case "$ARCH" in \
-        amd64) LG_ARCH="x86_64" ;; \
-        arm64) LG_ARCH="arm64" ;; \
-        *) echo "Unsupported architecture for lazygit: $ARCH" && exit 1 ;; \
-    esac && \
-    LG_URL="https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${LG_ARCH}.tar.gz" && \
-    curl -fsSL "$LG_URL" -o /tmp/lazygit.tgz && \
-    tar -xzf /tmp/lazygit.tgz -C /tmp lazygit && \
-    install /tmp/lazygit /usr/local/bin/lazygit && \
-    rm -f /tmp/lazygit.tgz /tmp/lazygit && \
-    echo "Installing GitHub CLI gh ${GH_VERSION}" && \
-    ARCH=$(dpkg --print-architecture) && \
-    case "$ARCH" in \
-        amd64) GH_ARCH="amd64" ;; \
-        arm64) GH_ARCH="arm64" ;; \
-        *) echo "Unsupported architecture for gh: $ARCH" && exit 1 ;; \
-    esac && \
-    GH_URL="https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${GH_ARCH}.tar.gz" && \
-    mkdir -p /tmp/gh && curl -fsSL "$GH_URL" -o /tmp/gh.tgz && \
-    tar -xzf /tmp/gh.tgz -C /tmp/gh && \
-    install /tmp/gh/gh_${GH_VERSION}_linux_${GH_ARCH}/bin/gh /usr/local/bin/gh && \
-    rm -rf /tmp/gh /tmp/gh.tgz && \
+    rm -rf /tmp/* /var/tmp/*
+
+# ------------------------------------------------------------------
+# Optional heavy tools (act, actionlint, ast-grep, zellij, lazygit, gh)
+# Can be disabled with --build-arg INSTALL_HEAVY_TOOLS=false
+# ------------------------------------------------------------------
+ARG INSTALL_HEAVY_TOOLS
+RUN if [ "${INSTALL_HEAVY_TOOLS}" = "true" ]; then \
+        ARCH=$(dpkg --print-architecture) && \
+        echo "Installing act (GitHub Actions emulator) ${ACT_VERSION}" && \
+        case "$ARCH" in \
+            amd64) ACT_ARCH="x86_64" ;; \
+            arm64) ACT_ARCH="arm64" ;; \
+            *) echo "Unsupported architecture for act: $ARCH" && exit 1 ;; \
+        esac && \
+        ACT_URL="https://github.com/nektos/act/releases/download/v${ACT_VERSION}/act_Linux_${ACT_ARCH}.tar.gz" && \
+        curl -fsSL "$ACT_URL" | tar -xz -C /usr/local/bin act && \
+        chmod +x /usr/local/bin/act && \
+        rm -rf /tmp/* /var/tmp/* && \
+        echo "Installing actionlint ${ACTIONLINT_VERSION}" && \
+        case "$ARCH" in \
+            amd64) ACTIONLINT_ARCH="amd64" ;; \
+            arm64) ACTIONLINT_ARCH="arm64" ;; \
+            *) echo "Unsupported architecture for actionlint: $ARCH" && exit 1 ;; \
+        esac && \
+        ACTIONLINT_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_${ACTIONLINT_ARCH}.tar.gz" && \
+        curl -fsSL "$ACTIONLINT_URL" | tar -xz -C /usr/local/bin actionlint && \
+        chmod +x /usr/local/bin/actionlint && \
+        rm -rf /tmp/* /var/tmp/* && \
+        echo "Installing ast-grep ${AST_GREP_VERSION}" && \
+        case "$ARCH" in \
+            amd64) SG_ARCH="x86_64" ;; \
+            arm64) SG_ARCH="aarch64" ;; \
+            *) echo "Unsupported architecture for ast-grep: $ARCH" && exit 1 ;; \
+        esac && \
+        AST_GREP_URL="https://github.com/ast-grep/ast-grep/releases/download/${AST_GREP_VERSION}/app-${SG_ARCH}-unknown-linux-gnu.zip" && \
+        curl -fsSL "$AST_GREP_URL" -o /tmp/ast-grep.zip && \
+        unzip -q /tmp/ast-grep.zip -d /tmp/ast-grep && \
+        install /tmp/ast-grep/sg /usr/local/bin/sg && \
+        install /tmp/ast-grep/ast-grep /usr/local/bin/ast-grep || cp /tmp/ast-grep/sg /usr/local/bin/ast-grep && \
+        rm -rf /tmp/ast-grep /tmp/ast-grep.zip && \
+        rm -rf /tmp/* /var/tmp/* && \
+        echo "Installing zellij ${ZELLIJ_VERSION}" && \
+        case "$ARCH" in \
+            amd64) ZELLIJ_ARCH="x86_64" ;; \
+            arm64) ZELLIJ_ARCH="aarch64" ;; \
+            *) echo "Unsupported architecture for zellij: $ARCH" && exit 1 ;; \
+        esac && \
+        ZELLIJ_URL="https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/zellij-${ZELLIJ_ARCH}-unknown-linux-musl.tar.gz" && \
+        curl -fsSL "$ZELLIJ_URL" -o /tmp/zellij.tgz && \
+        tar -xzf /tmp/zellij.tgz -C /usr/local/bin zellij && \
+        rm -f /tmp/zellij.tgz && \
+        rm -rf /tmp/* /var/tmp/* && \
+        echo "Installing lazygit ${LAZYGIT_VERSION}" && \
+        case "$ARCH" in \
+            amd64) LG_ARCH="x86_64" ;; \
+            arm64) LG_ARCH="arm64" ;; \
+            *) echo "Unsupported architecture for lazygit: $ARCH" && exit 1 ;; \
+        esac && \
+        LG_URL="https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${LG_ARCH}.tar.gz" && \
+        curl -fsSL "$LG_URL" -o /tmp/lazygit.tgz && \
+        tar -xzf /tmp/lazygit.tgz -C /tmp lazygit && \
+        install /tmp/lazygit /usr/local/bin/lazygit && \
+        rm -f /tmp/lazygit.tgz /tmp/lazygit && \
+        rm -rf /tmp/* /var/tmp/* && \
+        echo "Installing GitHub CLI gh ${GH_VERSION}" && \
+        case "$ARCH" in \
+            amd64) GH_ARCH="amd64" ;; \
+            arm64) GH_ARCH="arm64" ;; \
+            *) echo "Unsupported architecture for gh: $ARCH" && exit 1 ;; \
+        esac && \
+        GH_URL="https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${GH_ARCH}.tar.gz" && \
+        mkdir -p /tmp/gh && curl -fsSL "$GH_URL" -o /tmp/gh.tgz && \
+        tar -xzf /tmp/gh.tgz -C /tmp/gh && \
+        install /tmp/gh/gh_${GH_VERSION}_linux_${GH_ARCH}/bin/gh /usr/local/bin/gh && \
+        rm -rf /tmp/gh /tmp/gh.tgz && \
+        rm -rf /tmp/* /var/tmp/*; \
+    else \
+        echo "Skipping heavy tools installation (INSTALL_HEAVY_TOOLS=false)"; \
+    fi && \
     # Ensure zoxide present (fallback if package absent or outdated)
     if ! command -v zoxide >/dev/null 2>&1; then \
         echo "Installing latest zoxide via upstream script"; \
@@ -180,14 +196,17 @@ RUN --mount=type=cache,target=/home/vscode/.cache,uid=1000,gid=1000 \
     if [ "${INSTALL_AI_CLIS}" = "true" ]; then npm install -g @google/gemini-cli @anthropic-ai/claude-code @openai/codex; fi && \
     npm install -g pnpm yarn && \
     npm install -g typescript ts-node tsx @types/node nodemon concurrently && \
-    npm install -g vite esbuild prettier eslint @biomejs/biome tsc-watch
+    npm install -g vite esbuild prettier eslint @biomejs/biome tsc-watch && \
+    npm cache clean --force && \
+    rm -rf /tmp/* /var/tmp/*
 
 # Add silent nvm use to interactive shells
 RUN echo 'nvm use --silent default >/dev/null 2>&1 || nvm use --silent --lts >/dev/null 2>&1' >> ${USER_HOME}/.zshrc
 
 # Install Bun (JavaScript runtime and package manager)
 RUN curl -fsSL https://bun.sh/install | bash && \
-    echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ${USER_HOME}/.zshrc
+    echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ${USER_HOME}/.zshrc && \
+    rm -rf /tmp/* /var/tmp/*
 
 # Make Bun available system-wide by adding to PATH
 USER root
@@ -236,7 +255,8 @@ USER root
 ENV POETRY_HOME=/opt/poetry
 RUN --mount=type=cache,target=/root/.cache/pip \
     curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION} && \
-    ln -s ${POETRY_HOME}/bin/poetry /usr/local/bin/poetry
+    ln -s ${POETRY_HOME}/bin/poetry /usr/local/bin/poetry && \
+    rm -rf /tmp/* /var/tmp/*
 
 # Configure Poetry for vscode user (in-project virtualenvs)
 USER ${USERNAME}
@@ -251,7 +271,8 @@ RUN poetry config virtualenvs.in-project true --global || true
 RUN --mount=type=cache,target=${USER_HOME}/.cargo/registry \
     --mount=type=cache,target=${USER_HOME}/.cargo/git \
     cargo install cargo-watch cargo-edit cargo-audit 2>/dev/null || \
-    echo "Note: Some cargo tools may fail to install during build but will be available at runtime"
+    echo "Note: Some cargo tools may fail to install during build but will be available at runtime" && \
+    rm -rf /tmp/* /var/tmp/*
 
 # Set zsh as the default shell for the vscode user
 USER root
