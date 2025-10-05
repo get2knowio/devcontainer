@@ -13,7 +13,7 @@ This document describes all available build arguments for customizing your DevCo
 | `INSTALL_ZELLIJ` | `true` | Terminal multiplexer | ~20MB |
 | `INSTALL_LAZYGIT` | `true` | Git TUI | ~15MB |
 | `INSTALL_GH` | `true` | GitHub CLI | ~30MB |
-| `INSTALL_AI_CLIS` | `true` | Gemini, Claude, Codex CLIs | ~200MB |
+| `INSTALL_AI_CLIS` | `true` | Gemini, Claude, Codex, Copilot CLIs | ~200MB |
 | `UPDATE_NPM` | `true` | Update npm to latest version | Minimal |
 
 ## Usage Examples
@@ -126,6 +126,7 @@ Command-line interfaces for AI services:
 - Google Gemini CLI (`gemini`)
 - Anthropic Claude CLI (`claude`)
 - OpenAI Codex CLI (`codex`)
+- GitHub Copilot CLI (`copilot`)
 
 **When to disable:** Not using AI tools, or prefer web interfaces.
 
