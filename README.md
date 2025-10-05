@@ -27,6 +27,7 @@ AI / LLM CLIs:
 - `@google/gemini-cli`
 - `@anthropic-ai/claude-code`
 - `@openai/codex` (Codex CLI)
+- `@github/copilot` (GitHub Copilot CLI)
 
 Dev & CI Utilities:
 - Docker CLI (with in-container daemon from feature) + Buildx
@@ -114,7 +115,7 @@ Notes:
 
 The image supports several build arguments for customization:
 
-- `INSTALL_AI_CLIS` (default: `true`) - Install AI CLI tools (Gemini, Claude, OpenAI Codex)
+- `INSTALL_AI_CLIS` (default: `true`) - Install AI CLI tools (Gemini, Claude, OpenAI Codex, GitHub Copilot)
 - `INSTALL_HEAVY_TOOLS` (default: `true`) - Install heavy development tools (act, actionlint, ast-grep, zellij, lazygit, gh)
 
 Example of building a minimal version without heavy tools:
