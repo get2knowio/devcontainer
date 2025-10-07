@@ -28,6 +28,7 @@ AI / LLM CLIs:
 - `@anthropic-ai/claude-code`
 - `@openai/codex` (Codex CLI)
 - `@github/copilot` (GitHub Copilot CLI)
+- `opencode-ai` (OpenCode AI)
 
 Dev & CI Utilities:
 - Docker CLI (with in-container daemon from feature) + Buildx

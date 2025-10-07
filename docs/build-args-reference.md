@@ -127,6 +127,7 @@ Command-line interfaces for AI services:
 - Anthropic Claude CLI (`claude`)
 - OpenAI Codex CLI (`codex`)
 - GitHub Copilot CLI (`copilot`)
+- OpenCode AI (`opencode`)
 
 **When to disable:** Not using AI tools, or prefer web interfaces.
 

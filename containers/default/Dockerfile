@@ -14,7 +14,7 @@
 #    • Starship prompt + zsh enhancements
 #    • Node.js LTS via nvm (NOT a feature) + npm global tools
 #    • Rust via feature: rustc, cargo, rust-analyzer, rustfmt, clippy
-#    • AI CLIs: @google/gemini-cli, @anthropic-ai/claude-code, @openai/codex, @github/copilot
+#    • AI CLIs: @google/gemini-cli, @anthropic-ai/claude-code, @openai/codex, @github/copilot, opencode-ai
 #    • TS tooling: typescript, ts-node, tsx, @types/node, nodemon, concurrently,
 #                  vite, esbuild, prettier, eslint, @biomejs/biome, tsc-watch,
 #                  pnpm, yarn, bun
@@ -204,7 +204,7 @@ RUN --mount=type=cache,target=/home/vscode/.cache,uid=1000,gid=1000 \
     export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && \
     nvm install --lts && nvm alias default 'lts/*' && \
     if [ "${UPDATE_NPM}" = "true" ]; then echo "Updating npm to latest"; npm install -g npm@latest; fi && \
-    if [ "${INSTALL_AI_CLIS}" = "true" ]; then npm install -g @google/gemini-cli @anthropic-ai/claude-code @openai/codex @github/copilot; fi && \
+    if [ "${INSTALL_AI_CLIS}" = "true" ]; then npm install -g @google/gemini-cli @anthropic-ai/claude-code @openai/codex @github/copilot opencode-ai; fi && \
     npm install -g pnpm yarn && \
     npm install -g typescript ts-node tsx @types/node nodemon concurrently && \
     npm install -g vite esbuild prettier eslint @biomejs/biome tsc-watch && \
