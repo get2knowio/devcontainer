@@ -270,6 +270,30 @@ USER ${USERNAME}
 RUN poetry config virtualenvs.in-project true --global || true
 
 # ------------------------------------------------------------------
+# Spec Kit (Specify CLI) via uv (as vscode user)
+# ------------------------------------------------------------------
+ARG INSTALL_SPECKIT=true
+RUN --mount=type=tmpfs,target=/tmp \
+    if [ "${INSTALL_SPECKIT}" = "true" ]; then \
+        echo "Installing Specify CLI (Spec Kit) via uv" && \
+        # Ensure uv is present; install only if missing
+        if command -v uv >/dev/null 2>&1; then \
+          echo "uv already installed: $(command -v uv)"; \
+          UV_BIN="$(command -v uv)"; \
+        else \
+          echo "uv not found; installing via Astral script"; \
+          curl -Ls https://astral.sh/uv/install.sh | sh; \
+          UV_BIN="$HOME/.local/bin/uv"; \
+        fi && \
+        # Ensure ~/.local/bin on PATH for interactive shells
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ${USER_HOME}/.zshrc && \
+        "$UV_BIN" tool install specify-cli --from git+https://github.com/github/spec-kit.git; \
+    else \
+        echo "Skipping Spec Kit installation (INSTALL_SPECKIT=false)"; \
+    fi && \
+    rm -rf /var/tmp/*
+
+# ------------------------------------------------------------------
 # Additional Rust development tools (as vscode user)
 # ------------------------------------------------------------------
 # Install common Rust development tools via cargo
