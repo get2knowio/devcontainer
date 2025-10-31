@@ -24,7 +24,7 @@
 ########################################################################
 
 # syntax=docker/dockerfile:1.7-labs
-FROM mcr.microsoft.com/devcontainers/python:3.12@sha256:b50c5ea95641cfe6514afc0706e80d671f52e560978765bd9015beb824fecc20
+FROM mcr.microsoft.com/devcontainers/python:3.12@sha256:132c3dc2b618d194d5d56e4b385e11f5f67b265008a3d7cdddf806ab3ff8572b
 
 LABEL maintainer="you@example.com"
 
