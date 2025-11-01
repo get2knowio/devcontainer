@@ -248,7 +248,6 @@ RUN curl -fsSL https://bun.sh/install | bash && \
     rm -rf /tmp/* /var/tmp/*
 
 # Install CodeRabbit CLI (conditionally based on INSTALL_AI_CLIS)
-ARG INSTALL_AI_CLIS
 RUN --mount=type=tmpfs,target=/tmp \
     if [ "${INSTALL_AI_CLIS}" = "true" ]; then \
         curl --connect-timeout ${CURL_CONNECT_TIMEOUT} --max-time ${CURL_MAX_TIME} -fsSL https://cli.coderabbit.ai/install.sh | sh; \
