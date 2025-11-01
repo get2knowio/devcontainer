@@ -14,7 +14,7 @@
 #    • Starship prompt + zsh enhancements
 #    • Node.js LTS via nvm (NOT a feature) + npm global tools
 #    • Rust via feature: rustc, cargo, rust-analyzer, rustfmt, clippy
-#    • AI CLIs: @google/gemini-cli, @anthropic-ai/claude-code, @openai/codex, @github/copilot, opencode-ai
+#    • AI CLIs: @google/gemini-cli, @anthropic-ai/claude-code, @openai/codex, @github/copilot, opencode-ai, coderabbit
 #    • TS tooling: typescript, ts-node, tsx, @types/node, nodemon, concurrently,
 #                  vite, esbuild, prettier, eslint, @biomejs/biome, tsc-watch,
 #                  pnpm, yarn, bun
@@ -245,6 +245,15 @@ RUN curl -fsSL https://bun.sh/install | bash && \
     echo '  rustup completions zsh cargo > ~/.zsh/completion/_cargo 2>/dev/null || true' >> ${USER_HOME}/.zshrc && \
     echo '  fpath=(~/.zsh/completion $fpath)' >> ${USER_HOME}/.zshrc && \
     echo 'fi' >> ${USER_HOME}/.zshrc && \
+    rm -rf /tmp/* /var/tmp/*
+
+# Install CodeRabbit CLI (conditionally based on INSTALL_AI_CLIS)
+RUN --mount=type=tmpfs,target=/tmp \
+    if [ "${INSTALL_AI_CLIS}" = "true" ]; then \
+        curl --connect-timeout ${CURL_CONNECT_TIMEOUT} --max-time ${CURL_MAX_TIME} -fsSL https://cli.coderabbit.ai/install.sh | sh; \
+    else \
+        echo "Skipping CodeRabbit CLI installation (INSTALL_AI_CLIS=false)"; \
+    fi && \
     rm -rf /tmp/* /var/tmp/*
 
 # Make Bun available system-wide by adding to PATH
