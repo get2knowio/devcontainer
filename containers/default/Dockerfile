@@ -247,8 +247,14 @@ RUN curl -fsSL https://bun.sh/install | bash && \
     echo 'fi' >> ${USER_HOME}/.zshrc && \
     rm -rf /tmp/* /var/tmp/*
 
-# Install CodeRabbit CLI
-RUN curl -fsSL https://cli.coderabbit.ai/install.sh | sh && \
+# Install CodeRabbit CLI (conditionally based on INSTALL_AI_CLIS)
+ARG INSTALL_AI_CLIS
+RUN --mount=type=tmpfs,target=/tmp \
+    if [ "${INSTALL_AI_CLIS}" = "true" ]; then \
+        curl --connect-timeout ${CURL_CONNECT_TIMEOUT} --max-time ${CURL_MAX_TIME} -fsSL https://cli.coderabbit.ai/install.sh | sh; \
+    else \
+        echo "Skipping CodeRabbit CLI installation (INSTALL_AI_CLIS=false)"; \
+    fi && \
     rm -rf /tmp/* /var/tmp/*
 
 # Make Bun available system-wide by adding to PATH
