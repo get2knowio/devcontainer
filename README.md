@@ -29,6 +29,7 @@ AI / LLM CLIs:
 - `@openai/codex` (Codex CLI)
 - `@github/copilot` (GitHub Copilot CLI)
 - `opencode-ai` (OpenCode AI)
+- `coderabbit` (CodeRabbit CLI)
 
 Dev & CI Utilities:
 - Docker CLI (with in-container daemon from feature) + Buildx

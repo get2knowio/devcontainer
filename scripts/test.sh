@@ -151,7 +151,7 @@ PY
         rm -f /tmp/x.ts /tmp/x.js'
 
     echo -e "${BLUE}▶ AI CLIs${NC}"
-    dc_exec 'set -e; for t in gemini claude copilot opencode; do command -v $t >/dev/null || { echo "$t missing"; exit 1; }; done'
+    dc_exec 'set -e; for t in gemini claude copilot opencode coderabbit; do command -v $t >/dev/null || { echo "$t missing"; exit 1; }; done'
 
     echo -e "${BLUE}▶ Rust ecosystem${NC}"
     dc_exec 'set -e;
@@ -276,6 +276,7 @@ PY
             command -v claude >/dev/null 2>&1 && echo "✅ Claude CLI available" || { echo "❌ Claude CLI missing"; exit 1; }
             command -v copilot >/dev/null 2>&1 && echo "✅ Copilot CLI available" || { echo "❌ Copilot CLI missing"; exit 1; }
             command -v opencode >/dev/null 2>&1 && echo "✅ OpenCode CLI available" || { echo "❌ OpenCode CLI missing"; exit 1; }
+            command -v coderabbit >/dev/null 2>&1 && echo "✅ CodeRabbit CLI available" || { echo "❌ CodeRabbit CLI missing"; exit 1; }
             
             # Test Node.js functionality
             node -e "console.log(\"✅ Node.js execution test passed\")" || { echo "❌ Node.js execution failed"; exit 1; }
