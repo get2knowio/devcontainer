@@ -155,9 +155,15 @@ PY
 
     echo -e "${BLUE}▶ Rust ecosystem${NC}"
     dc_exec 'set -e;
-        for t in rustc cargo rustfmt clippy rust-analyzer; do
+        for t in rustc cargo rustfmt rust-analyzer; do
             if command -v "$t" >/dev/null; then echo "✅ $t present"; else echo "❌ $t missing"; exit 1; fi;
         done;
+        # Check clippy via cargo-clippy or clippy-driver
+        if command -v cargo-clippy >/dev/null || command -v clippy-driver >/dev/null || cargo clippy --version >/dev/null 2>&1; then
+            echo "✅ clippy present";
+        else
+            echo "❌ clippy missing"; exit 1;
+        fi;
         rustc --version;
         cargo --version;
         echo "fn main() { println!(\"Hello Rust\"); }" > /tmp/hello.rs;
@@ -351,7 +357,18 @@ test_docker_in_docker() {
         fi
         docker info >/dev/null 2>&1 && echo "✅ Docker daemon ready" || { echo "❌ dockerd failed"; exit 1; }
         timeout 60 docker pull alpine:latest >/dev/null 2>&1 && echo "✅ Pull alpine" || { echo "❌ Pull failed"; exit 1; }
-        docker run --rm alpine:latest echo ok >/dev/null 2>&1 && echo "✅ Run alpine" || { echo "❌ Run failed"; exit 1; }
+        
+        # Try to run Alpine with better error reporting
+        if docker run --rm alpine:latest echo ok 2>/tmp/docker-run-error.log; then
+            echo "✅ Run alpine"
+        else
+            echo "❌ Run failed"
+            echo "Docker run error output:"
+            cat /tmp/docker-run-error.log 2>/dev/null || echo "No error log available"
+            echo "Docker daemon logs:"
+            tail -20 /tmp/dockerd.log 2>/dev/null || echo "No daemon log available"
+            exit 1
+        fi
     '
 }
 
