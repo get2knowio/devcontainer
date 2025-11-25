@@ -351,8 +351,8 @@ test_docker_in_docker() {
         set -e
         command -v docker >/dev/null 2>&1 || { echo "❌ Docker CLI missing"; exit 1; }
         if ! docker info >/dev/null 2>&1; then
-            echo "ℹ️ Starting dockerd"
-            sudo dockerd --host=unix:///var/run/docker.sock --pidfile=/var/run/docker.pid >/tmp/dockerd.log 2>&1 &
+            echo "ℹ️ Starting dockerd with vfs storage driver (overlayfs nesting workaround)"
+            sudo dockerd --storage-driver=vfs --host=unix:///var/run/docker.sock --pidfile=/var/run/docker.pid >/tmp/dockerd.log 2>&1 &
             for i in {1..25}; do docker info >/dev/null 2>&1 && break || sleep 1; done
         fi
         docker info >/dev/null 2>&1 && echo "✅ Docker daemon ready" || { echo "❌ dockerd failed"; exit 1; }
